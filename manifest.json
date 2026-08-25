@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.zharinov.super-w-wait",
+  "name": "SUPER + W... wait",
+  "version": "0.1.0",
+  "author": "zharinov",
+  "description": "Requires a second press of SUPER + W to close a window.",
+  "license": "MIT",
+  "kinds": [
+    "panel"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "panel": "CloseConfirmation.qml"
+  }
+}
