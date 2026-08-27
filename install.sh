@@ -11,6 +11,16 @@ start_marker="-- super-w-wait:start"
 end_marker="-- super-w-wait:end"
 require_line='require("super-w-wait")'
 
+wait_for_plugin() {
+  for ((attempt = 0; attempt < 200; attempt++)); do
+    if omarchy-shell "$ipc_target" state >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.05
+  done
+  return 1
+}
+
 for command in omarchy omarchy-shell hyprctl luac; do
   command -v "$command" >/dev/null || {
     echo "Missing required command: $command" >&2
@@ -54,14 +64,7 @@ source_module="$script_dir/hypr/super-w-wait.lua"
 luac -p "$source_module"
 omarchy plugin validate "$script_dir"
 
-for ((attempt = 0; attempt < 200; attempt++)); do
-  if omarchy-shell "$ipc_target" state >/dev/null 2>&1; then
-    break
-  fi
-  sleep 0.05
-done
-
-omarchy-shell "$ipc_target" state >/dev/null || {
+wait_for_plugin || {
   echo "The plugin is not enabled or Omarchy Shell is unavailable." >&2
   exit 1
 }
@@ -84,6 +87,12 @@ if [[ "$integration_state" == "absent" ]]; then
   printf '\n%s\n%s\n%s\n' "$start_marker" "$require_line" "$end_marker" >>"$bindings"
   echo "Updated $bindings (backup: $backup)"
 fi
+
+omarchy restart shell >/dev/null
+wait_for_plugin || {
+  echo "The plugin did not start after restarting Omarchy Shell." >&2
+  exit 1
+}
 
 hyprctl reload >/dev/null
 errors=$(hyprctl configerrors)
