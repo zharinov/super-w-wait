@@ -50,9 +50,7 @@ if [[ "$integration_state" == "managed" ]]; then
 fi
 
 if [[ -f "$module" ]]; then
-  module_backup="$module.bak.$(date -u +%Y%m%d%H%M%S)"
-  mv -- "$module" "$module_backup"
-  echo "Backed up the Hyprland module to $module_backup"
+  rm -- "$module"
 fi
 
 if ! hyprctl reload >/dev/null; then

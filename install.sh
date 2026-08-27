@@ -74,9 +74,6 @@ if [[ -e "$module" ]] && ! cmp -s "$source_module" "$module"; then
     echo "Refusing to overwrite an unmanaged file: $module" >&2
     exit 1
   fi
-  module_backup="$module.bak.$(date -u +%Y%m%d%H%M%S)"
-  cp -- "$module" "$module_backup"
-  echo "Backed up the previous Hyprland module to $module_backup"
 fi
 
 install -m 0644 "$source_module" "$module"

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.zharinov.super-w-wait",
   "name": "SUPER + W... wait",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "zharinov",
   "description": "Requires a second press of SUPER + W to close a window.",
   "license": "MIT",
