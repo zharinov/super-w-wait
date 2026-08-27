@@ -10,7 +10,6 @@ module="$hypr_dir/super-w-wait.lua"
 start_marker="-- super-w-wait:start"
 end_marker="-- super-w-wait:end"
 require_line='require("super-w-wait")'
-default_settings_line='super_w_wait = { timeout = 1500 }'
 
 for command in omarchy omarchy-shell hyprctl luac; do
   command -v "$command" >/dev/null || {
@@ -77,41 +76,12 @@ if [[ -e "$module" ]] && ! cmp -s "$source_module" "$module"; then
   echo "Backed up the previous Hyprland module to $module_backup"
 fi
 
-if [[ "$integration_state" == "managed" ]]; then
-  read -r settings_before_require settings_after_require < <(awk -v start="$start_marker" -v require="$require_line" -v end="$end_marker" '
-    $0 == start { state = 1; next }
-    $0 == require { state = 2; next }
-    $0 == end { state = 0; next }
-    state == 1 && $0 ~ /^[[:space:]]*super_w_wait[[:space:]]*=/ { before++ }
-    state == 2 && $0 ~ /^[[:space:]]*super_w_wait[[:space:]]*=/ { after++ }
-    END { print before + 0, after + 0 }
-  ' "$bindings")
-
-  if ((settings_before_require > 1 || settings_after_require > 0)); then
-    echo "The timeout setting in $bindings is duplicated or misplaced." >&2
-    exit 1
-  fi
-
-  if ((settings_before_require == 0)); then
-    backup="$bindings.bak.super-w-wait.$(date -u +%Y%m%d%H%M%S)"
-    temporary=$(mktemp "$hypr_dir/.bindings.lua.super-w-wait.XXXXXX")
-    cp -- "$bindings" "$backup"
-    awk -v require="$require_line" -v settings="$default_settings_line" '
-      $0 == require { print settings }
-      { print }
-    ' "$bindings" >"$temporary"
-    chmod --reference="$bindings" "$temporary"
-    mv -- "$temporary" "$bindings"
-    echo "Updated $bindings (backup: $backup)"
-  fi
-fi
-
 install -m 0644 "$source_module" "$module"
 
 if [[ "$integration_state" == "absent" ]]; then
   backup="$bindings.bak.super-w-wait.$(date -u +%Y%m%d%H%M%S)"
   cp -- "$bindings" "$backup"
-  printf '\n%s\n%s\n%s\n%s\n' "$start_marker" "$default_settings_line" "$require_line" "$end_marker" >>"$bindings"
+  printf '\n%s\n%s\n%s\n' "$start_marker" "$require_line" "$end_marker" >>"$bindings"
   echo "Updated $bindings (backup: $backup)"
 fi
 

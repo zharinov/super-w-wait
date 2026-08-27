@@ -26,6 +26,18 @@ omarchy plugin update io.github.zharinov.super-w-wait &&
   ~/.config/omarchy/plugins/io.github.zharinov.super-w-wait/install.sh
 ```
 
+## Configuration
+
+In `~/.config/hypr/bindings.lua`:
+
+```lua
+super_w_wait = {
+  timeout = 1500, -- 250–10000 ms
+}
+
+require("super-w-wait")
+```
+
 ## Uninstall
 
 ```bash
